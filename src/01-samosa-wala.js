@@ -75,12 +75,57 @@
  */
 export function createSamosaCart(ownerName, location) {
   // Your code here
+  return {
+  owner:ownerName,
+  location:location,
+  menu:{samosa:15,jalebi:20,kachori:25},
+  sales:[],
+  sellItem(itemName,quantity){
+  if(typeof itemName!=="string" || quantity<=0){
+  return -1
+  }
+  if(this.menu.hasOwnProperty(itemName)){
+  const price=this.menu[itemName]
+  this.sales.push({item:itemName,quantity,total:price*quantity})
+  return price * quantity;
+  }else{
+  return -1;
+  }
+  },
+  getDailySales(){
+  if(this.sales.length===0) return 0;
+   const total = this.sales.reduce((acc,value)=>(
+   acc=acc+value.total
+   ),0);
+   return total;
+  },
+  getPopularItem(){
+    if(this.sales.length==0) return null;
+    this.sales.sort((a,b)=>a.quantity-b.quantity);
+    return this.sales.at(-1).item;
+  },
+  moveTo(newLocation){
+  if(typeof newLocation!=="string" || newLocation.trim()===""){
+  return null;
+  }
+  this.location=newLocation;
+  return `${this.owner} ka cart ab ${newLocation} pe hai!`;
+  },
+  resetDay(){
+  this.sales=[];
+  return `${this.owner} ka naya din shuru!`
+  }
+  }
 }
 
 export function demonstrateThisLoss(cart) {
   // Your code here
+  const{sellItem}=cart;
+  return sellItem;
 }
 
 export function fixWithBind(cart) {
   // Your code here
+   const {sellItem}=cart;
+   return sellItem.bind(cart);
 }

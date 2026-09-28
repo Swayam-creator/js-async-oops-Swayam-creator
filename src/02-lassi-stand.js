@@ -73,15 +73,68 @@
  */
 export function LassiStand(name, city) {
   // Your code here
+  this.name=name;
+  this.city=city;
+  this.menu = [];
+  this.orders = [];
+  this._nextOrderId=1;
 }
 
 // Add prototype methods here:
-// LassiStand.prototype.addFlavor = function(flavor, price) { ... }
-// LassiStand.prototype.takeOrder = function(customerName, flavor, quantity) { ... }
-// LassiStand.prototype.completeOrder = function(orderId) { ... }
-// LassiStand.prototype.getRevenue = function() { ... }
-// LassiStand.prototype.getMenu = function() { ... }
+ LassiStand.prototype.addFlavor = function(flavor, price) {
+
+    if(!this.menu?.find((m)=>m.flavor===flavor) && price>0){
+     this.menu.push({flavor,price});
+     } else{
+        return -1;
+     }
+     return this.menu.length;
+}
+ LassiStand.prototype.takeOrder = function(customerName, flavor, quantity) {
+    if(this.menu?.find((m)=>m.flavor===flavor) && quantity>0){
+     const flavorPrice = this.menu.reduce((acc,value)=>{
+     if(value.flavor===flavor) acc=value.price
+     return acc
+     },0)
+     const order={
+     id:this.orders.length==0 ? 1 : this._nextOrderId +1,
+     customer:customerName,
+     flavor,
+     quantity,
+     total:flavorPrice*quantity,
+     status:"pending"
+     }
+     this.orders.push(order);
+     return order.id;
+     } else{
+        return -1;
+     }
+    return -1;
+ }
+ LassiStand.prototype.completeOrder = function(orderId) {
+ if(typeof orderId!=="number" || Number.isNaN(orderId)) return false;
+ const order = this.orders.find((o)=>o.id===orderId);
+ if(!order || order.status==="completed") return false;
+ order.status="completed";
+ return true;
+}
+
+
+
+LassiStand.prototype.getRevenue = function() {
+const revenue= this.orders.reduce((acc,value)=>{
+if(value.status==="completed"){
+acc=acc+value.total;
+}
+return acc;
+},0);
+return revenue;
+}
+LassiStand.prototype.getMenu = function() {
+  return [...this.menu]
+}
 
 export function isLassiStand(obj) {
   // Your code here
+  return (obj instanceof LassiStand);
 }

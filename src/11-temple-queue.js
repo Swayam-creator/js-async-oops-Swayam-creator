@@ -125,53 +125,94 @@ export class TempleQueue {
 
   constructor(templeName, maxCapacity) {
     // Your code here
+    this.#devotees=[];
+    this.#maxCapacity=maxCapacity>0 ? maxCapacity : 100;
+    this.templeName=templeName;
+    this.#vipEnabled=false;
   }
 
   get length() {
     // Your code here
+    return this.#devotees.length;
   }
 
   get isEmpty() {
     // Your code here
+    return this.#devotees.length===0;
   }
 
   get vipEnabled() {
     // Your code here
+    return this.#vipEnabled;
   }
 
   set vipEnabled(value) {
     // Your code here
+    if(typeof value!=="boolean"){
+      throw new TypeError("VIP status must be a boolean");
+    }
+    this.#vipEnabled=value;
   }
 
   enqueue(name, type) {
     // Your code here
+    if(!["regular","vip"].includes(type)) return null;
+    if(!name) return null;
+    const devotee = {
+      name,
+      type,
+      joinedAt: new Date().toISOString()
+    };
+    if(this.#devotees.length>=this.#maxCapacity) return null;
+    if(type==="vip" && this.#vipEnabled) this.#devotees.unshift(devotee)
+    else {
+     this.#devotees.push(devotee);
+    }
+    return devotee;
   }
 
   dequeue() {
     // Your code here
+    if(this.#devotees.length===0) return null;
+
+    return this.#devotees.shift();
   }
 
   peek() {
     // Your code here
+    if(this.#devotees.length===0) return null;
+    return this.#devotees.at(0);
   }
 
   contains(name) {
     // Your code here
+    return this.#devotees.includes((devotee)=>devotee.name===name);
   }
 
   toArray() {
     // Your code here
+    return this.#devotees.slice();
   }
 
   static merge(queue1, queue2) {
     // Your code here
+    let queueName = `${queue1.templeName}-${queue2.templeName}`;
+    let maxCapacity = queue1.length + queue2.length +2;
+    let queue = new TempleQueue(queueName,maxCapacity);
+    return [...queue1,...queue2];
   }
 
   static fromArray(templeName, maxCapacity, arr) {
     // Your code here
+    let tempQueue = new TempleQueue(templeName,arr,maxCapacity);
+    if(!Array.isArray(arr)) return tempQueue;
+    for(const name of arr){
+      tempQueue.enqueue(name,"regular");
+    }
+    return tempQueue;
   }
 
   [Symbol.iterator]() {
-    // Your code here
+    return this.#devotees[Symbol.iterator]();
   }
 }
